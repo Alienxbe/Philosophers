@@ -6,7 +6,7 @@
 /*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:44:58 by marykman          #+#    #+#             */
-/*   Updated: 2024/09/02 18:16:53 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/10 13:53:32 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,31 +15,50 @@
 
 # define USAGE_STR		"Usage: ./philo <philo_count> <time_to_die> \
 <time_to_eat> <time_to_sleep> [max_eat]"
-# define THREAD_COUNT	4
 
 # include <pthread.h>
+# include <sys/time.h>
+# include <stdatomic.h>
+
+typedef struct s_philo	t_philo;
+typedef struct s_data	t_data;
 
 typedef enum e_philo_state
 {
-	STATE_NONE = -1,
+	STATE_FORK_TAKEN,
 	STATE_EATING,
 	STATE_SLEEPING,
-	STATE_WAITING,
+	STATE_THINKING,
 	STATE_DEAD,
 	STATE_LEN
 }	t_philo_state;
 
-typedef struct s_philo
+struct s_philo
 {
-	int				philo_count;
+	int				id;
+	int				eat_count;
+	struct timeval	last_meal;
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
+	pthread_t		t;
+	t_data			*data;
+};
+
+struct s_data
+{
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				max_eat;
-	pthread_t		*t;
-	pthread_mutex_t	mutex_print;
-}	t_philo;
+	int				philo_count;
+	int				dead;
+	t_philo			*philos;
+	pthread_mutex_t	*forks;
+	pthread_mutex_t	print_mutex;
+	pthread_mutex_t	dead_mutex;
+	struct timeval	start_time;
+};
 
-int	parse_arguments(int argc, const char **argv, t_philo *philo);
+int	parse_arguments(int argc, const char **argv, t_data *data);
 
 #endif
