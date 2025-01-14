@@ -1,36 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   get_time.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/02 15:46:04 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/13 19:14:02 by marykman         ###   ########.fr       */
+/*   Created: 2025/01/13 18:00:42 by marykman          #+#    #+#             */
+/*   Updated: 2025/01/13 19:02:10 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "philo.h"
+#include <stddef.h>
+#include <sys/time.h>
 
-int main(int argc, char const **argv)
+unsigned long	get_time(struct timeval start_time)
 {
-	t_data	data;
+	struct timeval	actual_time;
 
-	data = (t_data){0};
-	if (parse_arguments(argc, argv, &data))
-	{
-		printf("%s\n", USAGE_STR);
-		return (1);
-	}
-	if (argc == 6 && !data.max_eat)
-		return (0);
-	if (init_data(&data))
-	{
-		free(data.philos);
-		return (1);
-	};
-	free(data.philos);
-	return (0);
+	gettimeofday(&actual_time, NULL);
+	return ((actual_time.tv_usec - start_time.tv_usec) / 1000
+		+ (actual_time.tv_sec - start_time.tv_sec) * 1000);
 }

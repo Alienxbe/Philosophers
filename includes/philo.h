@@ -6,7 +6,7 @@
 /*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:44:58 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/10 13:53:32 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/14 17:38:35 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,9 @@ struct s_data
 	struct timeval	start_time;
 };
 
-int	parse_arguments(int argc, const char **argv, t_data *data);
+void	*routine(void *arg);
+void	pprint_state(t_philo *philo, t_philo_state state);
+int		init_data(t_data *data);
+int		parse_arguments(int argc, const char **argv, t_data *data);
 
 #endif

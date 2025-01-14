@@ -6,7 +6,7 @@
 #    By: marykman <marykman@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/02 15:44:08 by marykman          #+#    #+#              #
-#    Updated: 2024/09/02 17:55:39 by marykman         ###   ########.fr        #
+#    Updated: 2025/01/13 19:13:41 by marykman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,11 +33,15 @@ LIBRARIES			:=
 
 NAME				:=	philo
 FILES				:=	main.c \
-						parsing.c
+						parsing.c \
+						init.c \
+						routine.c \
+						printing.c
 FILES_UTILS			:=	ft_index.c \
 						ft_isspace.c \
 						ft_strlen.c \
-						ft_strtol.c
+						ft_strtol.c \
+						get_time.c
 SRCS				:=	$(addprefix srcs/, ${FILES})
 SRCS				+=	$(addprefix srcs/utils/, ${FILES_UTILS})
 OBJS				:=	$(patsubst srcs%.c, objs%.o, ${SRCS})
