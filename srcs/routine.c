@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marykman <marykman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:27:36 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/17 02:18:21 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/17 03:06:54 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,13 @@ static void	eating(t_philo *philo)
 
 static void	sleeping(t_philo *philo)
 {
-	if (philo->eat_count >= philo->data->max_eat && philo->data->max_eat >= 0)
+	int	is_dead;
+
+	pthread_mutex_lock(&philo->data->dead_mutex);
+	is_dead = philo->data->dead;
+	pthread_mutex_unlock(&philo->data->dead_mutex);
+	if ((philo->eat_count >= philo->data->max_eat && philo->data->max_eat >= 0)
+		|| is_dead)
 		return ;
 	pprint_state(philo, STATE_SLEEPING);
 	ft_usleep(philo, philo->data->time_to_sleep);
@@ -62,12 +68,17 @@ void	*routine(void *arg)
 	philo = (t_philo *)arg;
 	if (philo->id % 2)
 		usleep(philo->data->time_to_eat / 2 * 1000);
+	pthread_mutex_lock(&philo->data->dead_mutex);
 	while (!philo->data->dead && (philo->data->max_eat == -1 || philo->eat_count < philo->data->max_eat))
 	{
+		pthread_mutex_unlock(&philo->data->dead_mutex);
 		eating(philo);
+		// check_death(philo);
 		sleeping(philo);
 		check_death(philo);
 		pprint_state(philo, STATE_THINKING);
+		pthread_mutex_lock(&philo->data->dead_mutex);
 	}
+	pthread_mutex_unlock(&philo->data->dead_mutex);
 	return (NULL);
 }

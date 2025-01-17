@@ -6,7 +6,7 @@
 /*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 18:02:26 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/13 19:04:06 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/17 03:05:45 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ void	pprint_state(t_philo *philo, t_philo_state state)
 	state_str[STATE_DEAD] = "died";
 	time = get_time(philo->data->start_time);
 	pthread_mutex_lock(&philo->data->print_mutex);
+	pthread_mutex_lock(&philo->data->dead_mutex);
 	if (!(philo->data->dead))
 		printf("%ld %d %s\n", time, philo->id, state_str[state]);
+	pthread_mutex_unlock(&philo->data->dead_mutex);
 	pthread_mutex_unlock(&philo->data->print_mutex);
 }
