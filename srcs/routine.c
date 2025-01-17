@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
+/*   By: marykman <marykman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 17:27:36 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/13 19:03:18 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/17 02:18:21 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,46 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <stdio.h>
+static void	ft_usleep(t_philo *philo, unsigned long mtime)
+{
+	if ((unsigned long)philo->data->time_to_die < get_time(philo->last_meal) + mtime)
+		mtime = philo->data->time_to_die;
+	// printf("sleeping %lu\n", mtime);
+	usleep(mtime * 1000);
+}
+
+static void	eating(t_philo *philo)
+{
+	pthread_mutex_lock(philo->left_fork);
+	pprint_state(philo, STATE_FORK_TAKEN);
+	pthread_mutex_lock(philo->right_fork);
+	pprint_state(philo, STATE_FORK_TAKEN);
+	pprint_state(philo, STATE_EATING);
+	gettimeofday(&philo->last_meal, NULL);
+	ft_usleep(philo, philo->data->time_to_eat);
+	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_unlock(philo->left_fork);
+	philo->eat_count++;
+}
+
+static void	sleeping(t_philo *philo)
+{
+	if (philo->eat_count >= philo->data->max_eat && philo->data->max_eat >= 0)
+		return ;
+	pprint_state(philo, STATE_SLEEPING);
+	ft_usleep(philo, philo->data->time_to_sleep);
+}
+
+static void	check_death(t_philo *philo)
+{
+	if (get_time(philo->last_meal) < (unsigned long)philo->data->time_to_die)
+		return ;
+	pprint_state(philo, STATE_DEAD);
+	pthread_mutex_lock(&philo->data->dead_mutex);
+	philo->data->dead = 1;
+	pthread_mutex_unlock(&philo->data->dead_mutex);
+}
 void	*routine(void *arg)
 {
 	t_philo	*philo;
@@ -24,33 +64,10 @@ void	*routine(void *arg)
 		usleep(philo->data->time_to_eat / 2 * 1000);
 	while (!philo->data->dead && (philo->data->max_eat == -1 || philo->eat_count < philo->data->max_eat))
 	{
-		pthread_mutex_lock(philo->left_fork);
-		pthread_mutex_lock(philo->right_fork);
-
-		// eating
-		pprint_state(philo, STATE_EATING);
-		gettimeofday(&philo->last_meal, NULL);
-		usleep(philo->data->time_to_eat * 1000);
-
-		pthread_mutex_unlock(philo->right_fork);
-		pthread_mutex_unlock(philo->left_fork);
-		philo->eat_count++;
-
-		// sleeping
-		pprint_state(philo, STATE_SLEEPING);
-		usleep(philo->data->time_to_sleep * 1000);
-		if (get_time(philo->last_meal) >= (unsigned long)philo->data->time_to_die)
-		{
-			pprint_state(philo, STATE_DEAD);
-			pthread_mutex_lock(&philo->data->dead_mutex);
-			philo->data->dead = 1;
-			pthread_mutex_unlock(&philo->data->dead_mutex);
-			break ;
-		}
-
-		// thinking
+		eating(philo);
+		sleeping(philo);
+		check_death(philo);
 		pprint_state(philo, STATE_THINKING);
-		
 	}
 	return (NULL);
 }

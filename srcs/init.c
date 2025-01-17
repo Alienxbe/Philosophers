@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
+/*   By: marykman <marykman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/13 19:12:49 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/14 19:44:00 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/17 01:55:42 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static void	init_philo(t_data *data)
 
 	i = -1;
 	while (++i < data->philo_count){
-		data->philos[i].id = i;
+		data->philos[i].id = i + 1;
 		gettimeofday(&data->philos[i].last_meal, NULL);
 		data->philos[i].left_fork = &data->forks[i];
 		data->philos[i].right_fork = &data->forks[(i + 1) % data->philo_count];
@@ -53,10 +53,20 @@ static int	init_thread(t_data *data)
 	return (EXIT_SUCCESS);
 }
 
+static int	join_thread(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (++i < data->philo_count)
+		if (pthread_join(data->philos[i].t, NULL))
+			return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}
+
 int	init_data(t_data *data)
 {
 	int	ret;
-	int	i;
 
 	ret = 0;
 	data->philos = (t_philo *)malloc(sizeof(t_philo) * data->philo_count);
@@ -69,13 +79,6 @@ int	init_data(t_data *data)
 	init_philo(data);
 	gettimeofday(&data->start_time, NULL);
 	ret = init_thread(data);
-
-	// Maint thread
-
-	// Rejoin Philos
-	i = -1;
-	while (++i < data->philo_count)
-		if (pthread_join(data->philos[i].t, NULL))
-			return (1);
+	ret = join_thread(data);
 	return (ret);
 }
