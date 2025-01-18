@@ -1,16 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   printing.c                                         :+:      :+:    :+:   */
+/*   monitoring.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/13 18:02:26 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/18 01:02:57 by marykman         ###   ########.fr       */
+/*   Created: 2025/01/18 00:38:59 by marykman          #+#    #+#             */
+/*   Updated: 2025/01/18 01:05:14 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include "utils.h"
 #include "philo.h"
 
@@ -26,25 +25,18 @@ static void	check_death(t_philo *philo)
 	pprint_state(philo, STATE_DEAD);
 }
 
-void	pprint_state(t_philo *philo, t_philo_state state)
+void	monitoring(t_data *data)
 {
-	const char		*state_str[STATE_LEN];
-	unsigned long	time;
+	int	i;
 
-	if (state != STATE_DEAD)
-		check_death(philo);
-	state_str[STATE_FORK_TAKEN] = "has taken a fork";
-	state_str[STATE_EATING] = "is eating";
-	state_str[STATE_SLEEPING] = "is sleeping";
-	state_str[STATE_THINKING] = "is thinking";
-	state_str[STATE_DEAD] = "died";
-	time = get_time(philo->data->start_time);
-	pthread_mutex_lock(&philo->data->print_mutex);
-	pthread_mutex_lock(&philo->data->dead_mutex);
-	if (!(philo->data->dead))
-		printf("%ld %d %s\n", time, philo->id, state_str[state]);
-	if (state == STATE_DEAD)
-		philo->data->dead = 1;
-	pthread_mutex_unlock(&philo->data->dead_mutex);
-	pthread_mutex_unlock(&philo->data->print_mutex);
+	pthread_mutex_lock(&data->dead_mutex);
+	while (!data->dead)
+	{
+		pthread_mutex_unlock(&data->dead_mutex);
+		i = -1;
+		while (++i < data->philo_count)
+			check_death(&data->philos[i]);
+		pthread_mutex_lock(&data->dead_mutex);
+	}
+	pthread_mutex_unlock(&data->dead_mutex);
 }

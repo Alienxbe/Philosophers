@@ -6,12 +6,12 @@
 /*   By: marykman <marykman@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/02 15:44:58 by marykman          #+#    #+#             */
-/*   Updated: 2025/01/14 17:38:35 by marykman         ###   ########.fr       */
+/*   Updated: 2025/01/18 01:18:39 by marykman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef PHILO_H
+# define PHILO_H
 
 # define USAGE_STR		"Usage: ./philo <philo_count> <time_to_die> \
 <time_to_eat> <time_to_sleep> [max_eat]"
@@ -40,6 +40,7 @@ struct s_philo
 	struct timeval	last_meal;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	last_meal_mutex;
 	pthread_t		t;
 	t_data			*data;
 };
@@ -60,8 +61,10 @@ struct s_data
 };
 
 void	*routine(void *arg);
+void	monitoring(t_data *data);
 void	pprint_state(t_philo *philo, t_philo_state state);
 int		init_data(t_data *data);
+void	destroy_data(t_data *data);
 int		parse_arguments(int argc, const char **argv, t_data *data);
 
 #endif

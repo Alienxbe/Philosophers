@@ -6,7 +6,7 @@
 #    By: marykman <marykman@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/02 15:44:08 by marykman          #+#    #+#              #
-#    Updated: 2025/01/17 02:49:20 by marykman         ###   ########.fr        #
+#    Updated: 2025/01/18 01:22:15 by marykman         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,9 @@ FILES				:=	main.c \
 						parsing.c \
 						init.c \
 						routine.c \
-						printing.c
+						monitoring.c \
+						printing.c \
+						destroy.c
 FILES_UTILS			:=	ft_index.c \
 						ft_isspace.c \
 						ft_strlen.c \
